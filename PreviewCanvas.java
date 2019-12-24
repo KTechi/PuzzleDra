@@ -13,6 +13,7 @@ public class PreviewCanvas extends Canvas{
 		gc = getGraphicsContext2D();
 		cellSize = (int) (this.getWidth()/5);
 		enemyHp = 100;
+		paint();
 	}
 
 	public void paint(){
@@ -23,7 +24,7 @@ public class PreviewCanvas extends Canvas{
 		gc.strokeText("BossEnemy", 50, 50);
 		for(int i = 0; i < monster.length; i++) {
 			gc.setFill(monster[i]);
-			gc.strokeRect(this.getWidth()-cellSize, cellSize + cellSize*i, cellSize, cellSize);
+			gc.strokeRect(cellSize + cellSize*i, this.getWidth()-cellSize, cellSize, cellSize);
 		}
 	}
 
