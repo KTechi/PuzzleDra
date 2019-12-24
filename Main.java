@@ -58,9 +58,13 @@ public class Main extends Application implements EventHandler {
 			if (processing) return;
 			puzzleCanvas.XX = e.getX();
 			puzzleCanvas.YY = e.getY();
+			puzzleCanvas.isPressing = true;
 			executer.switchStone(e.getX(), e.getY());
 		} else if (e.getEventType() == MouseEvent.MOUSE_RELEASED) {
 			processing = true;
+			puzzleCanvas.XX = -100;
+			puzzleCanvas.YY = -100;
+			puzzleCanvas.isPressing = false;
 			executer.decide();
 			processing = false;
 		}
