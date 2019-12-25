@@ -1,4 +1,5 @@
 import javafx.scene.canvas.*;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 public class PuzzleCanvas extends Canvas {
@@ -8,6 +9,14 @@ public class PuzzleCanvas extends Canvas {
 	double XX = -100, YY = -100;
 	boolean isPressing = false;
 	
+	Image[] stones = {
+			new Image("yellowStone.png"),
+			new Image("darkStone.png"),
+			new Image("blueStone.png"),
+			new Image("redStone.png"),
+			new Image("greenStone.png"),
+			new Image("pinkStone.png")
+	};
 	Color[] stoneColor = {
 			Color.YELLOW,
 			Color.GRAY,
@@ -31,7 +40,7 @@ public class PuzzleCanvas extends Canvas {
 
 	void paint() {
 		// set BackGround
-		gc.setFill(Color.BLACK);
+		gc.setFill(new Color(0.2, 0.1, 0.1, 1));
 		gc.fillRect(0, 0, this.getWidth(), this.getHeight());
 
 		// print Stones
@@ -59,15 +68,13 @@ public class PuzzleCanvas extends Canvas {
 			if (y==field.length-1 && SIZE*field.length-1<=YY && x==0 && XX<=1) continue;//Left Down
 			if (y==field.length-1 && SIZE*field.length-1<=YY && x==field[0].length-1 && SIZE*field[0].length-1<=XX) continue;//Right Down
 
-			gc.setFill(stoneColor[field[y][x]]);
-			gc.fillOval(x * SIZE, y * SIZE, SIZE, SIZE);
+			gc.drawImage(stones[field[y][x]], x * SIZE, y * SIZE, SIZE, SIZE);
 		}
 
 		// if is not pressing
 		if (!isPressing) {
 			if (field[0][0] == -1) return;
-			gc.setFill(stoneColor[field[0][0]]);
-			gc.fillOval(0, 0, SIZE, SIZE);
+			gc.drawImage(stones[field[0][0]], 0, 0, SIZE, SIZE);
 			return;
 		}
 
@@ -80,7 +87,6 @@ public class PuzzleCanvas extends Canvas {
 
 		// set selected Stone
 		//選択した石の描画
-		gc.setFill(stoneColor[field[(int)YY/SIZE][(int)XX/SIZE]]);
-		gc.fillOval(XX-SIZE/2, YY-SIZE/2, SIZE, SIZE);
+		gc.drawImage(stones[field[(int)YY/SIZE][(int)XX/SIZE]], XX-SIZE/2, YY-SIZE/2, SIZE, SIZE);
 	}
 }
