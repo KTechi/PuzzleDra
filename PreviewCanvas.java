@@ -1,19 +1,23 @@
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 public class PreviewCanvas extends Canvas{
 	GraphicsContext gc;
 	public int enemyHp;
 	public int cellSize;
-	Color[] monster = {
-		Color.RED,
-		Color.BLUE,
-		Color.GREEN,
-		Color.YELLOW,
-		Color.PURPLE,
-		Color.RED
+	Image[] monster = {
+		new Image("redM.jpg"),
+		new Image("blueM.jpg"),
+		new Image("greenM.jpg"),
+		new Image("holyM.jpg"),
+		new Image("darkM.jpg"),
+		new Image("redM.jpg"),
 	};
+
+	Image boss = new Image("bossM.jpg");
+	//Image maze = new Image("maze.jpg");
 
 	public PreviewCanvas(){
 		super(480, 300);
@@ -27,12 +31,10 @@ public class PreviewCanvas extends Canvas{
 		gc.clearRect(0, 0, this.getWidth(), this.getHeight());
 		gc.setStroke(Color.GREEN);
 		gc.setLineWidth(3);
-		gc.strokeLine(100, 160, 400, 160);
-		gc.setStroke(Color.RED);
-		gc.strokeText("BossEnemy", 200, 150);
+		gc.strokeLine(75, 190, 405, 190);
+		gc.drawImage(boss, 80, 10, 320, 170);
 		for(int i = 0; i < monster.length; i++) {
-			gc.setFill(monster[i]);
-			gc.fillRect(cellSize*i,this.getHeight()-cellSize, cellSize, cellSize);
+			gc.drawImage(monster[i],cellSize*i,this.getHeight()-cellSize, cellSize, cellSize);
 		}
 	}
 
