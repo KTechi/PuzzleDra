@@ -23,23 +23,50 @@ public class Executer {
 			////実際のfieldの配列数と一致させる
 			selectX = (int)x/stoneSize;
 			selectY = (int)y/stoneSize;
+
+			//選択する数値が配列範囲を超えないための処理
+			if(selectX >= field[0].length) {
+				selectX = field[0].length-1;
+			}else if(selectX < 0) {
+				selectX = 0;
+			}
+
+			if(selectY >= field.length) {
+				selectY = field.length-1;
+			}else if(selectY < 0) {
+				selectY = 0;
+			}
+
 			prevX = selectX;
 			prevY = selectY;
 			selectStone = field[selectY][selectX];
-		}
+		}else {
 
-		prevX = nowX;
-		prevY = nowY;
-	    nowX = (int)x/stoneSize;
-		nowY = (int)y/stoneSize;
+
+			prevX = nowX;
+			prevY = nowY;
+		    nowX = (int)x/stoneSize;
+			nowY = (int)y/stoneSize;
+
+			//選択する数値が配列範囲を超えないための処理
+			if(nowX >= field[0].length) {
+				nowX = field[0].length-1;
+			}else if(nowX < 0) {
+				nowX = 0;
+			}
+
+			if(nowY >= field.length) {
+				nowY = field.length-1;
+			}else if(nowY < 0) {
+				nowY = 0;
+			}
+		}
 
 		if(nowX != prevX || nowY != prevY) {
 			temp = field[prevY][prevX];//前にいる場所の石を保存
 			field[prevY][prevX] = field[nowY][nowX];//前の場所の石と今の場所の石を入れ替える
 			field[nowY][nowX] = temp;//今の場所に、前の場所の石を入れる。
 		}
-
-
 	}
 
 	void decide() {

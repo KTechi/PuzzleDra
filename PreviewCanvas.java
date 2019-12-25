@@ -6,25 +6,33 @@ public class PreviewCanvas extends Canvas{
 	GraphicsContext gc;
 	public int enemyHp;
 	public int cellSize;
-	Color[] monster = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE};
+	Color[] monster = {
+		Color.RED,
+		Color.BLUE,
+		Color.GREEN,
+		Color.YELLOW,
+		Color.PURPLE,
+		Color.RED
+	};
 
 	public PreviewCanvas(){
 		super(480, 300);
 		gc = getGraphicsContext2D();
-		cellSize = (int) (this.getWidth()/5);
+		cellSize = (int) (this.getWidth()/6);
 		enemyHp = 100;
 		paint();
 	}
 
 	public void paint(){
 		gc.clearRect(0, 0, this.getWidth(), this.getHeight());
-		gc.setStroke(Color.RED);
+		gc.setStroke(Color.GREEN);
 		gc.setLineWidth(3);
-		gc.strokeLine(200, 90, 400, 90);
-		gc.strokeText("BossEnemy", 50, 50);
+		gc.strokeLine(100, 160, 400, 160);
+		gc.setStroke(Color.RED);
+		gc.strokeText("BossEnemy", 200, 150);
 		for(int i = 0; i < monster.length; i++) {
 			gc.setFill(monster[i]);
-			gc.strokeRect(cellSize + cellSize*i, this.getWidth()-cellSize, cellSize, cellSize);
+			gc.fillRect(cellSize*i,this.getHeight()-cellSize, cellSize, cellSize);
 		}
 	}
 
