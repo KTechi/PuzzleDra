@@ -25,7 +25,7 @@ public class PuzzleCanvas extends Canvas {
 	int[][] field;
 	
 	private Timeline timeline;
-	private int duration = 10;
+	private int duration = 6;
 	private int frame;
 	private int status;
 	
@@ -60,6 +60,7 @@ public class PuzzleCanvas extends Canvas {
 	
 	void released() {
 		isPressing = false;
+		frame = 0;
 		status = 0;
 		timeline.play();
 	}
@@ -120,15 +121,21 @@ public class PuzzleCanvas extends Canvas {
 						// 消す石がある場合、field[][]の値 -1 で埋める。
 						// 消す石が無い場合、終了
 						if (status == 0) {
-							boolean tmp = executer.calculateScore();
-							
-							if (!tmp) {// アニメーション終了
-								paint();
-								timeline.stop();
+							if (frame != 0) {
+								if (frame < 50) frame++;
+								else {
+									frame = 0;
+									if (executer.calculateScore()) frame = 1;
+									else status = 1;
+								}
+							} else {
+								if (!executer.calculateScore()) {// アニメーション終了
+									paint();
+									timeline.stop();
+									System.out.println("アニメーション終了");
+								} else frame = 1;
 							}
-							while (executer.calculateScore());
-							frame = 0;
-							status = 1;
+							paint();
 						}
 						// 落ちるアニメーション
 						else if (status == 1) {
