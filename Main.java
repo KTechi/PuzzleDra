@@ -10,7 +10,6 @@ public class Main extends Application implements EventHandler {
 	private PreviewCanvas previewCanvas;
 	private PuzzleCanvas puzzleCanvas;
 	private Executer executer;
-	private boolean processing = false;
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -28,14 +27,17 @@ public class Main extends Application implements EventHandler {
 		// Executer
 		executer = new Executer(puzzleCanvas.field);
 		
+		// Connect Classes
+		puzzleCanvas.setExecuter(executer);
+		
 		// Pane
 		BorderPane bp = new BorderPane();
 		bp.setTop(previewCanvas);
 		bp.setCenter(puzzleCanvas);
 		
 		// Scene
-		Scene sc = new Scene(bp, 480, 900);
-
+		Scene sc = new Scene(bp, 480, 725);
+		
 		// Stage
 		primaryStage.setTitle("PuzzleDra");
 		primaryStage.setMinWidth(480);
@@ -45,7 +47,7 @@ public class Main extends Application implements EventHandler {
 		primaryStage.setScene(sc);
 		primaryStage.show();
 	}
-
+	
 	@Override
 	public void handle(Event event) {
 		if (!(event instanceof MouseEvent)) {
@@ -54,21 +56,15 @@ public class Main extends Application implements EventHandler {
 		}
 		MouseEvent e = (MouseEvent)event;
 		
-		if (e.getEventType() == MouseEvent.MOUSE_DRAGGED) {
-			if (processing) return;
-			puzzleCanvas.XX = e.getX();
-			puzzleCanvas.YY = e.getY();
-			puzzleCanvas.isPressing = true;
+		if (e.getEventType() == MouseEvent.MOUSE_PRESSED) {
+//			if (previewCanvas.isProcessing) return;
+//			previewCanvas.isProcessing = true;
+			puzzleCanvas.pressed(e.getX(), e.getY());
+		} else if (e.getEventType() == MouseEvent.MOUSE_DRAGGED) {
 			executer.switchStone(e.getX(), e.getY());
+			puzzleCanvas.dragged(e.getX(), e.getY());
 		} else if (e.getEventType() == MouseEvent.MOUSE_RELEASED) {
-			processing = true;
-			puzzleCanvas.XX = -100;
-			puzzleCanvas.YY = -100;
-			puzzleCanvas.isPressing = false;
-			executer.decide();
-			processing = false;
+			puzzleCanvas.released();
 		}
-
-		puzzleCanvas.paint();
 	}
 }
