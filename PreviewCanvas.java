@@ -14,7 +14,10 @@ public class PreviewCanvas extends Canvas {
 	public int cellSize;
 	public int[] mHopMotion = {0, 0, 0, 0, 0, 0};///各モンスターに対応した跳ねる動作
 	public int[] combNum = {0, 0, 0, 0, 0, 0 };////各色のコンボ数 --画面にいるモンスターの色順(最後は回復)
- 	public int hop = 10;
+ 	private int hop = 10;
+ 	private int combSum = 0;
+ 	private int temp = 0;
+ 	public int status = 1;
 
 	Color[] mColor = {
 		Color.RED,
@@ -39,14 +42,15 @@ public class PreviewCanvas extends Canvas {
 	Image hpBar = new Image("HpBar.PNG");
 
 	//Animation
-	private Timeline attack;
-	private int duration = 500;
+	private Timeline timeline;
+	private int duration = 40;
 
 	public PreviewCanvas(){
 		super(480, 300);
 		gc = getGraphicsContext2D();
 		cellSize = (int) (this.getWidth()/6-7);
 		enemyHp = 330;
+		setTimeline();
 		paint();
 	}
 
@@ -77,18 +81,58 @@ public class PreviewCanvas extends Canvas {
 
 	/////////////////////////////////////////////////////////////////////
 	//////////////Attack////////////////////////////////////////////////
-	private void attack() {
-		attack = new Timeline(
+	public void attack() {
+		for(int i = 0; i < combNum.length; i++) {
+			combSum += combNum[i];
+		}
+		temp = hop;
+		timeline.play();
+	}
+
+	private void setTimeline() {
+		timeline = new Timeline(
 			new KeyFrame(
 				new Duration(duration),
 				new EventHandler<ActionEvent>() {
-
 					public void handle(ActionEvent event) {
+						if(combSum != 0) {
+							System.out.println(combSum);
+							if(status == 1) {
+								if(temp > 0) {
+									temp--;
+									for(int i = 0; i < mHopMotion.length; i++) {
+										mHopMotion[i]+=1;
+									}
+									System.out.println("paint1");
+									paint();
+								}else {
+									status = 0;
+								}
+							}else if(status == 0) {
+								if(temp <= hop) {
+									temp++;
+									for(int i = 0; i < mHopMotion.length; i++) {
+										mHopMotion[i]--;
+									}
+									System.out.println("paint2");
+									paint();
+								}else {
+									System.out.println("一コンボ終了");
+									combSum--;
+									status = 1;
+								}
+							}
+
+						}else {
+							System.out.println("finish");
+							timeline.stop();
+						}
 
 					}
 				}
 			)
 		);
+		timeline.setCycleCount(Timeline.INDEFINITE);
 	}
 
 }
