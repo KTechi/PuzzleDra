@@ -13,11 +13,11 @@ public class PuzzleCanvas extends Canvas {
 	private PreviewCanvas preview;
 	private GraphicsContext gc = getGraphicsContext2D();
 	private Image[] stones = {
+			new Image("redStone.png"),
+			new Image("blueStone.png"),
+			new Image("greenStone.png"),
 			new Image("yellowStone.png"),
 			new Image("darkStone.png"),
-			new Image("blueStone.png"),
-			new Image("redStone.png"),
-			new Image("greenStone.png"),
 			new Image("pinkStone.png")
 		};
 	private boolean isPressing = false;
@@ -67,6 +67,7 @@ public class PuzzleCanvas extends Canvas {
 		isPressing = false;
 		frame = 0;
 		status = 0;
+		executer.resetCombNum();
 		timeline.play();
 	}
 
@@ -138,7 +139,6 @@ public class PuzzleCanvas extends Canvas {
 									paint();
 									timeline.stop();
 									preview.attack();
-									System.out.println("アニメーション終了");
 								} else frame = 1;
 							}
 							paint();

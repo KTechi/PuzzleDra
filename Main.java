@@ -31,6 +31,7 @@ public class Main extends Application implements EventHandler {
 		// Connect Classes
 		puzzleCanvas.setExecuter(executer);
 		puzzleCanvas.setPreview(previewCanvas);
+		executer.setCombNum(previewCanvas.combNum);
 
 		// Pane
 		BorderPane bp = new BorderPane();
@@ -56,16 +57,17 @@ public class Main extends Application implements EventHandler {
 			System.out.println("Error [PuzzleCanvasEventHandler]");
 			return;
 		}
+		if (previewCanvas.isProcessing) return;
+		
 		MouseEvent e = (MouseEvent)event;
-
+		
 		if (e.getEventType() == MouseEvent.MOUSE_PRESSED) {
-			if (previewCanvas.isProcessing) return;
-			previewCanvas.isProcessing = true;
 			puzzleCanvas.pressed(e.getX(), e.getY());
 		} else if (e.getEventType() == MouseEvent.MOUSE_DRAGGED) {
 			executer.switchStone(e.getX(), e.getY());
 			puzzleCanvas.dragged(e.getX(), e.getY());
 		} else if (e.getEventType() == MouseEvent.MOUSE_RELEASED) {
+			previewCanvas.isProcessing = true;
 			puzzleCanvas.released();
 		}
 	}

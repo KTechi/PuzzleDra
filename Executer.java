@@ -5,7 +5,11 @@ public class Executer {
     int stoneSize;
     int selectStone;
     int prevX, prevY, nowX, nowY;
-
+    int[] combNum;
+    
+    void setCombNum(int[] cn) {
+    	combNum = cn;
+    }
 
 	public Executer(int[][] field) {
 		this.field = field;
@@ -67,11 +71,12 @@ public class Executer {
 			field[nowY][nowX] = temp;//今の場所に、前の場所の石を入れる。
 		}
 	}
-
-	void decide() {
-		///switchStoneで
-		///最初に押した位置を取得するため
+	
+	void resetCombNum() {
+		// switchStone() で最初に押したことを検知するため
 		firstTouch = true;
+		
+		for (int i = 0; i < combNum.length; i++) combNum[i] = 0;
 	}
 	
 	boolean calculateScore() {
@@ -97,6 +102,7 @@ public class Executer {
 					deleteMask[i][j] = false;
 
 				delete(x, y, deleteMask);
+				combNum[field[y][x]]++;
 
 				for (int i = 0; i < deleteMask.length; i++)
 				for (int j = 0; j < deleteMask[0].length; j++)
