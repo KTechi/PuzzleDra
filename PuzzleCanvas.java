@@ -10,6 +10,7 @@ import javafx.util.Duration;
 
 public class PuzzleCanvas extends Canvas {
 	private Executer executer;
+	private PreviewCanvas preview;
 	private GraphicsContext gc = getGraphicsContext2D();
 	private Image[] stones = {
 			new Image("yellowStone.png"),
@@ -23,12 +24,12 @@ public class PuzzleCanvas extends Canvas {
 	private final int SIZE = 80;
 	private double XX = -100, YY = -100;
 	int[][] field;
-	
+
 	private Timeline timeline;
 	private int duration = 6;
 	private int frame;
 	private int status;
-	
+
 	PuzzleCanvas() {
 		super(480, 402);
 
@@ -40,42 +41,46 @@ public class PuzzleCanvas extends Canvas {
 		setTimeline();
 		paint();
 	}
-	
+
 	void setExecuter(Executer e) {
 		executer = e;
 	}
-	
+
+	void setPreview(PreviewCanvas preview) {
+		this.preview = preview;
+	}
+
 	void pressed(double x, double y) {
 		isPressing = true;
 		XX = x;
 		YY = y;
 		paint();
 	}
-	
+
 	void dragged(double x, double y) {
 		XX = x;
 		YY = y;
 		paint();
 	}
-	
+
 	void released() {
 		isPressing = false;
 		frame = 0;
 		status = 0;
 		timeline.play();
 	}
-	
+
 	private void paint() {
 		// set BackGround
 		gc.setFill(new Color(0.2, 0.1, 0.1, 1));
 		gc.fillRect(0, 0, this.getWidth(), this.getHeight());
-		
+
 		// if XX or YY is out of canvas
 		if (XX < 0) XX = 0;
 		else if (SIZE * field[0].length - 1 < XX) XX = SIZE * field[0].length - 1;
 		if (YY < 0) YY = 0;
 		else if (SIZE * field.length - 1 < YY) YY = SIZE * field.length - 1;
-		
+
 		// print Stones
 		for (int y = 0; y < field.length; y++)
 		for (int x = 0; x < field[0].length; x++) {
@@ -83,18 +88,18 @@ public class PuzzleCanvas extends Canvas {
 			if (field[y][x] == -1) continue;
 			// do not print the stone if it is selected
 			if (isPressing && y == (int)YY / SIZE && x == (int)XX / SIZE) continue;
-			
+
 			gc.drawImage(stones[field[y][x]], x*SIZE, y*SIZE, SIZE, SIZE);
 		}
 		// paint the selected stone 選択した石の描画
 		if (isPressing) gc.drawImage(stones[field[(int)YY/SIZE][(int)XX/SIZE]], XX-SIZE/2, YY-SIZE/2, SIZE, SIZE);
 	}
-	
+
 	private void paint(int margin) {
 		// set BackGround
 		gc.setFill(new Color(0.2, 0.1, 0.1, 1));
 		gc.fillRect(0, 0, this.getWidth(), this.getHeight());
-		
+
 		// print Stones
 		boolean drop = false;
 		for (int x = 0; x < field[0].length; x++) {
@@ -110,7 +115,7 @@ public class PuzzleCanvas extends Canvas {
 			}
 		}
 	}
-	
+
 	private void setTimeline() {
 		timeline = new Timeline(
 			new KeyFrame(
@@ -132,6 +137,7 @@ public class PuzzleCanvas extends Canvas {
 								if (!executer.calculateScore()) {// アニメーション終了
 									paint();
 									timeline.stop();
+									preview.attack();
 									System.out.println("アニメーション終了");
 								} else frame = 1;
 							}
