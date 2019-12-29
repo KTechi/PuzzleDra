@@ -14,10 +14,12 @@ public class PreviewCanvas extends Canvas {
 	public int cellSize;
 	public int[] mHopMotion = {0, 0, 0, 0, 0, 0};///各モンスターに対応した跳ねる動作
 	public int[] combNum = {0, 0, 0, 0, 0, 0 };////各色のコンボ数 --画面にいるモンスターの色順(最後は回復)
+	public int[] damage = {0, 0, 0, 0, 0, 0};//////各モンスターが敵に与えるダメージ
  	private int hop = 10;
  	private int combSum = 0;
  	private int temp = 0;
  	public int status = 1;
+ 	public boolean isProcessing;
 
 	Color[] mColor = {
 		Color.RED,
@@ -50,6 +52,7 @@ public class PreviewCanvas extends Canvas {
 		gc = getGraphicsContext2D();
 		cellSize = (int) (this.getWidth()/6-7);
 		enemyHp = 330;
+		isProcessing = false;
 		setTimeline();
 		paint();
 	}
@@ -87,6 +90,7 @@ public class PreviewCanvas extends Canvas {
 		}
 		temp = hop;
 		timeline.play();
+		//combSum = 5;
 	}
 
 	private void setTimeline() {
@@ -125,6 +129,7 @@ public class PreviewCanvas extends Canvas {
 
 						}else {
 							System.out.println("finish");
+							isProcessing = false;
 							timeline.stop();
 						}
 
