@@ -1,4 +1,3 @@
-
 public class Executer {
 	int[][] field;
 	int selectX, selectY;
@@ -73,19 +72,15 @@ public class Executer {
 		///switchStoneで
 		///最初に押した位置を取得するため
 		firstTouch = true;
-
-		while(calculateScore()) {
-			dropStone();
-		}
 	}
-
-	public boolean calculateScore() {
+	
+	boolean calculateScore() {
 		boolean[][] deleteMask = new boolean[field.length][field[0].length];
-		boolean haveToDrop = false;
 		boolean haveToDelete = false;
 
 		for (int y = 0; y < field.length; y++)
 		for (int x = 0; x < field[0].length; x++) {
+			if (field[y][x] == -1) continue;
 			if (x + 1 < field[0].length && field[y][x] == field[y][x+1]) {
 				if (x + 2 < field[0].length && field[y][x] == field[y][x+2]) haveToDelete = true;
 				if (y + 1 < field.length    && field[y][x] == field[y+1][x]) haveToDelete = true;
@@ -96,11 +91,7 @@ public class Executer {
 				if (x + 1 < field[0].length && field[y][x] == field[y+1][x+1]) haveToDelete = true;
 				if (0 <= x - 1              && field[y][x] == field[y+1][x-1]) haveToDelete = true;
 			}
-
 			if (haveToDelete) {
-				haveToDelete = false;
-				haveToDrop = true;
-
 				for (int i = 0; i < deleteMask.length; i++)
 				for (int j = 0; j < deleteMask[0].length; j++)
 					deleteMask[i][j] = false;
@@ -109,35 +100,39 @@ public class Executer {
 
 				for (int i = 0; i < deleteMask.length; i++)
 				for (int j = 0; j < deleteMask[0].length; j++)
-					if (deleteMask[i][j])
-						field[i][j] = -1;
+					if (deleteMask[i][j]) field[i][j] = -1;
+				return true;
 			}
 		}
-		return haveToDrop;
+		return false;
 	}
 
 	private void delete(int x, int y, boolean[][] deleteMask) {
 		deleteMask[y][x] = true;
-
-		if (0 <= x - 1 && field[y][x] == field[y][x-1] && !deleteMask[y][x-1])              delete(x-1, y, deleteMask);
-		if (0 <= y - 1 && field[y][x] == field[y-1][x] && !deleteMask[y-1][x])              delete(x, y-1, deleteMask);
+		if (  0   <=     x - 1      && field[y][x] == field[y][x-1] && !deleteMask[y][x-1]) delete(x-1, y, deleteMask);
+		if (  0   <=     y - 1      && field[y][x] == field[y-1][x] && !deleteMask[y-1][x]) delete(x, y-1, deleteMask);
 		if (x + 1 < field[0].length && field[y][x] == field[y][x+1] && !deleteMask[y][x+1]) delete(x+1, y, deleteMask);
 		if (y + 1 < field.length    && field[y][x] == field[y+1][x] && !deleteMask[y+1][x]) delete(x, y+1, deleteMask);
 	}
 
-	public void dropStone() {
+	boolean dropStone() {
+		// drop stones only 1 block
 		for (int x = 0; x < field[0].length; x++)
-		for (int i = 0; i < 5; i++)
 		for (int y = field.length-2; 0 <= y; y--) {
 			if (field[y+1][x] != -1) continue;
 			field[y+1][x] = field[y][x];
 			field[y][x] = -1;
 		}
-
+		// return true, if you have to drop stones next turn
 		for (int x = 0; x < field[0].length; x++)
-		for (int y = 0; y < field.length; y++) {
-			if (field[y][x] == -1)
-				field[y][x] = (int)(Math.random()*6);
-		}
+		for (int y = 0; y < field.length - 1; y++)
+			if (field[y][x] != -1 && field[y+1][x] == -1) return true;
+		return false;
+	}
+	
+	void fillField() {
+		for (int y = 0; y < field.length; y++)
+		for (int x = 0; x < field[0].length; x++)
+			if (field[y][x] == -1) field[y][x] = (int)(Math.random()*6);
 	}
 }

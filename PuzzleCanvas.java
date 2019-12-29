@@ -1,92 +1,165 @@
-import javafx.scene.canvas.*;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 public class PuzzleCanvas extends Canvas {
-	GraphicsContext gc = getGraphicsContext2D();
-	private final int SIZE = 80;
-	int[][] field;
-	double XX = -100, YY = -100;
-	boolean isPressing = false;
-	
-	Image[] stones = {
+	private Executer executer;
+	private GraphicsContext gc = getGraphicsContext2D();
+	private Image[] stones = {
 			new Image("yellowStone.png"),
 			new Image("darkStone.png"),
 			new Image("blueStone.png"),
 			new Image("redStone.png"),
 			new Image("greenStone.png"),
 			new Image("pinkStone.png")
-	};
-	Color[] stoneColor = {
-			Color.YELLOW,
-			Color.GRAY,
-			Color.BLUE,
-			Color.RED,
-			Color.GREEN,
-			Color.PINK
 		};
-
+	private boolean isPressing = false;
+	private final int SIZE = 80;
+	private double XX = -100, YY = -100;
+	int[][] field;
+	
+	private Timeline timeline;
+	private int duration = 6;
+	private int frame;
+	private int status;
+	
 	PuzzleCanvas() {
 		super(480, 402);
 
 		field = new int[5][6];
 		for (int y = 0; y < field.length; y++)
 		for (int x = 0; x < field[0].length; x++) {
-			// make field
-			field[y][x] = (x + y) % 6;
+			field[y][x] = (x + y) % 6;// make field
 		}
+		setTimeline();
 		paint();
 	}
-
-	void paint() {
+	
+	void setExecuter(Executer e) {
+		executer = e;
+	}
+	
+	void pressed(double x, double y) {
+		isPressing = true;
+		XX = x;
+		YY = y;
+		paint();
+	}
+	
+	void dragged(double x, double y) {
+		XX = x;
+		YY = y;
+		paint();
+	}
+	
+	void released() {
+		isPressing = false;
+		frame = 0;
+		status = 0;
+		timeline.play();
+	}
+	
+	private void paint() {
 		// set BackGround
 		gc.setFill(new Color(0.2, 0.1, 0.1, 1));
 		gc.fillRect(0, 0, this.getWidth(), this.getHeight());
-
+		
+		// if XX or YY is out of canvas
+		if (XX < 0) XX = 0;
+		else if (SIZE * field[0].length - 1 < XX) XX = SIZE * field[0].length - 1;
+		if (YY < 0) YY = 0;
+		else if (SIZE * field.length - 1 < YY) YY = SIZE * field.length - 1;
+		
 		// print Stones
 		for (int y = 0; y < field.length; y++)
 		for (int x = 0; x < field[0].length; x++) {
 			// do not print -1
 			if (field[y][x] == -1) continue;
-			/////xとyはwindowでの位置なので、
-			////実際のfieldの配列数と一致させる
-			int stoneX = (int)XX / SIZE;
-			int stoneY = (int)YY / SIZE;
-			// if the Stone is selected
-			// 選択している石なら continue;(表示しない)
-			if (y == stoneY && x == stoneX) continue;
-
-			// if mouse is out of canvas keep select the nearest stone
-			//マウスカーソルがキャンバス外の時に、一番近い石を選択し続ける。(表示しない)
-			if (x==stoneX && YY<=1 && y==0) continue;//UP
-			if (x==stoneX && SIZE*field.length-1<YY && y==field.length-1) continue;//DOWN
-			if (y==stoneY && XX<=1 && x==0) continue;//LEFT
-			if (y==stoneY && SIZE*field[0].length-1<XX && x==field[0].length-1) continue;//RIGHT
-
-			if (y==0 && YY<=1 && x==0 && XX<=1) continue;//Left Up
-			if (y==0 && YY<=1 && x==field[0].length-1 && SIZE*field[0].length-1<=XX) continue;//Right Up
-			if (y==field.length-1 && SIZE*field.length-1<=YY && x==0 && XX<=1) continue;//Left Down
-			if (y==field.length-1 && SIZE*field.length-1<=YY && x==field[0].length-1 && SIZE*field[0].length-1<=XX) continue;//Right Down
-
-			gc.drawImage(stones[field[y][x]], x * SIZE, y * SIZE, SIZE, SIZE);
+			// do not print the stone if it is selected
+			if (isPressing && y == (int)YY / SIZE && x == (int)XX / SIZE) continue;
+			
+			gc.drawImage(stones[field[y][x]], x*SIZE, y*SIZE, SIZE, SIZE);
 		}
-
-		// if is not pressing
-		if (!isPressing) {
-			if (field[0][0] == -1) return;
-			gc.drawImage(stones[field[0][0]], 0, 0, SIZE, SIZE);
-			return;
+		// paint the selected stone 選択した石の描画
+		if (isPressing) gc.drawImage(stones[field[(int)YY/SIZE][(int)XX/SIZE]], XX-SIZE/2, YY-SIZE/2, SIZE, SIZE);
+	}
+	
+	private void paint(int margin) {
+		// set BackGround
+		gc.setFill(new Color(0.2, 0.1, 0.1, 1));
+		gc.fillRect(0, 0, this.getWidth(), this.getHeight());
+		
+		// print Stones
+		boolean drop = false;
+		for (int x = 0; x < field[0].length; x++) {
+			drop = false;
+			for (int y = field.length - 1; 0 <= y; y--) {
+				// do not print -1
+				if (field[y][x] == -1) {
+					drop = true;
+					continue;
+				}
+				if (drop) gc.drawImage(stones[field[y][x]], x*SIZE, y*SIZE+margin, SIZE, SIZE);
+				else      gc.drawImage(stones[field[y][x]], x*SIZE, y*SIZE, SIZE, SIZE);
+			}
 		}
-
-		// if XX out of canvas
-		if (XX <= 1) XX = 1;
-		else if (SIZE*field[0].length-1 < XX) XX = SIZE*field[0].length-1;
-		// if YY out of canvas
-		if (YY <= 1) YY = 1;
-		else if (SIZE*field.length-1 < YY) YY = SIZE*field.length-1;
-
-		// set selected Stone
-		//選択した石の描画
-		gc.drawImage(stones[field[(int)YY/SIZE][(int)XX/SIZE]], XX-SIZE/2, YY-SIZE/2, SIZE, SIZE);
+	}
+	
+	private void setTimeline() {
+		timeline = new Timeline(
+			new KeyFrame(
+				new Duration(duration),
+				new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						// 消す石がある場合、field[][]の値 -1 で埋める。
+						// 消す石が無い場合、終了
+						if (status == 0) {
+							if (frame != 0) {
+								if (frame < 50) frame++;
+								else {
+									frame = 0;
+									if (executer.calculateScore()) frame = 1;
+									else status = 1;
+								}
+							} else {
+								if (!executer.calculateScore()) {// アニメーション終了
+									paint();
+									timeline.stop();
+									System.out.println("アニメーション終了");
+								} else frame = 1;
+							}
+							paint();
+						}
+						// 落ちるアニメーション
+						else if (status == 1) {
+							paint(++frame);
+							if (SIZE < frame) {
+								frame = 0;
+								status = (executer.dropStone()) ? 1 : 2;
+							}
+						}
+						// field[][] の値が -1 ならランダムで値を埋める
+						else if (status == 2) {
+							frame++;
+							if (100 < frame) {
+								frame = 0;
+								status = 0;
+							} else if (frame == 50) {
+								executer.fillField();
+								paint();
+							}
+						}
+					}
+				}
+			)
+		);
+		timeline.setCycleCount(Timeline.INDEFINITE);
 	}
 }
